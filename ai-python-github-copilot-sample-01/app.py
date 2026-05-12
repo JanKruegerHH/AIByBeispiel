@@ -44,3 +44,27 @@ labels = [1, 1, 1, 1, 1, 0, 0, 0, 0, 0]  # 1 for positive, 0 for negative
 # Create a DataFrame
 df = pd.DataFrame({"text": texts, "label": labels})
 logger.info("Dataset Overview:\n%s", df)
+
+# Split the data
+train_df, test_df = train_test_split(df, test_size=0.3, random_state=42)
+logger.info(f"Training set: {len(train_df)} samples")
+logger.info(f"Test set: {len(test_df)} samples")
+logger.info("Dataset Train Overview:\n%s", train_df)
+logger.info("Dataset Test Overview:\n%s", test_df)
+
+# Convert to Hugging Face datasets
+train_dataset = Dataset.from_pandas(train_df)
+test_dataset = Dataset.from_pandas(test_df)
+
+# Initialize tokenizer
+tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
+
+
+# Tokenization function
+def tokenize_function(examples):
+    return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
+
+
+# Apply tokenization
+tokenized_train = train_dataset.map(tokenize_function, batched=True)
+tokenized_test = test_dataset.map(tokenize_function, batched=True)
