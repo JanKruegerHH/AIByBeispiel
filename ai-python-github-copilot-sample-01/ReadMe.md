@@ -18,6 +18,11 @@ Deactivate the virtual environment:
 (venv) ➜  ai-python-github-copilot-sample-01 git:(main): deactivate
 ```
 
+Set Hugging Face cache directory (optional, but can speed up subsequent runs):
+```bash
+export HF_TOKEN=[the token]
+```
+
 Run it:
 ```bash
 (venv) ➜  ai-python-github-copilot-sample-01 git:(main): python app.py
