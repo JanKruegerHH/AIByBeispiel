@@ -1,11 +1,11 @@
 Setup of the virtual einvironment:
 ```bash
-python3.14 -m venv aipycp01
+python3.14 -m venv venv
 ```
 
 Activate the virtual environment:
 ```bash
-source ./aipycp01/bin/activate
+source ./venv/bin/activate
 ```
 
 Install dependencies:
@@ -15,10 +15,10 @@ pip install -r requirements.txt
 
 Deactivate the virtual environment:
 ```bash
-(aipycp01) ➜  ai-python-github-copilot-sample-01 git:(main): deactivate
+(venv) ➜  ai-python-github-copilot-sample-01 git:(main): deactivate
 ```
 
 Run it:
 ```bash
-(aipycp01) ➜  ai-python-github-copilot-sample-01 git:(main): python app.py
+(venv) ➜  ai-python-github-copilot-sample-01 git:(main): python app.py
 ```
