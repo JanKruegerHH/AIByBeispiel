@@ -76,55 +76,53 @@ tokenized_test = test_dataset.map(tokenize_function, batched=True)
 model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased', num_labels=2)
 
 # Define training arguments - explicitly disable wandb
-# training_args = TrainingArguments(
-#     output_dir="./results",
-#     num_train_epochs=3,
-#     per_device_train_batch_size=2,
-#     per_device_eval_batch_size=2,
-#     weight_decay=0.01,
-#     #    evaluation_strategy=IntervalStrategy.EPOCH, #"epoch",
-#     #    save_strategy=SaveStrategy.EPOCH, #"epoch",
-#     #    save_strategy="best",
-#     load_best_model_at_end=True,
-#     report_to="none",  # Disable all integrations including wandb
-#     logging_dir="./logs",
-#     logging_strategy="epoch"
-# )
+training_args = TrainingArguments(
+    output_dir="./results",  # Directory for saving results
+    learning_rate=5e-5,  # Initial learning rate
+    per_device_train_batch_size=16,  # Batch size per GPU
+    num_train_epochs=3,  # Number of epochs
+    weight_decay=0.01,  # Regularization
+    logging_dir="./logs",  # Directory for logs
+    logging_steps=10  # Log every 10 steps
+)
+# logger.info("Training Args Overview:\n%s", training_args)
+
 
 # Define the Trainer
-# trainer = Trainer(
-#     model=model,
-#     args=training_args,
-#     train_dataset=tokenized_train,
-#     eval_dataset=tokenized_test,
-#     tokenizer=tokenizer,
-# )
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=tokenized_train,
+    eval_dataset=tokenized_test,
+    processing_class=tokenizer  # transformers >=5.0 renamed `tokenizer` to `processing_class`
+)
+# logger.info("Trainer Overview:\n%s", trainer)
 
 # Train the model
-# print("\nTraining the model...")
-# trainer.train()
+logger.info("\nTraining the model...")
+trainer.train()
 
 # Evaluate the model
-# print("\nEvaluating the model...")
-# eval_results = trainer.evaluate()
-# print(f"Evaluation results: {eval_results}")
+logger.info("\nEvaluating the model...")
+eval_results = trainer.evaluate()
+logger.info(f"Evaluation results: {eval_results}")
 
 # Make predictions on test set
-# predictions = trainer.predict(tokenized_test)
-# preds = np.argmax(predictions.predictions, axis=-1)
+predictions = trainer.predict(tokenized_test)
+preds = np.argmax(predictions.predictions, axis=-1)
 
 # Calculate accuracy
-# accuracy = accuracy_score(test_df["label"].values, preds)
-# print(f"\nAccuracy on test set: {accuracy:.4f}")
+accuracy = accuracy_score(test_df["label"].values, preds)
+logger.info(f"\nAccuracy on test set: {accuracy:.4f}")
 
 # Classification report
-# print("\nClassification Report:")
-# print(classification_report(test_df["label"].values, preds))
+logger.info("\nClassification Report:")
+logger.info(classification_report(test_df["label"].values, preds))
 
 # Save the model for later use
-# output_dir = "./saved_model"
-# if not os.path.exists(output_dir):
-#     os.makedirs(output_dir)
-# model.save_pretrained(output_dir)
-# tokenizer.save_pretrained(output_dir)
-# print(f"\nModel saved to {output_dir}")
+output_dir = "./saved_model"
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+model.save_pretrained(output_dir)
+tokenizer.save_pretrained(output_dir)
+logger.info(f"\nModel saved to {output_dir}")
